@@ -1,22 +1,35 @@
 os.loadAPI("apis/util.lua")
 
 function digLengthByWidth(length, width)
-    util.digMove(length - 1)
-    util.turnAround()
+    local isOnLeftSide = true
 
     for curLength = 1, length, 1 do
         -- do width
-        turtle.turnLeft()
-        util.digMove(width - 1)
+        if isOnLeftSide then
+            turtle.turnRight()
+            util.digMove(width - 1)
+            turtle.turnLeft()
+        else
+            turtle.turnLeft()
+            util.digMove(width - 1)
+            turtle.turnRight()
+        end
+        -- set current side to opposite side
+        isOnLeftSide = not isOnLeftSide
 
-        -- return to start of width
-        util.turnAround()
-        util.move(width -1)
-        turtle.turnLeft()
+        -- check if should move into next width row
         if curLength < length then
-            util.move()
+            util.digMove(1)
         end
     end
+    -- return to starting position
+    if not isOnLeftSide then
+        turtle.turnLeft()
+        util.move(width - 1)
+        turtle.turnRight()
+    end
+    util.turnAround()
+    util.move(length - 1)
     util.turnAround()
 end
 
@@ -29,6 +42,9 @@ function digLevelsToHeight(length, width, height)
         end
     end
     util.moveDown(height - 1)
+    util.turnAround()
+    util.move()
+    util.turnAround()
 end
 
 function validateInputs(length, width, height)
@@ -48,8 +64,9 @@ local height = tonumber(read())
 validateInputs(length, width, height)
 
 util.topUpFuel(true)
+print("I am a dwarf and I'm digging a hole")
 digLevelsToHeight(length, width, height)
-printFuelLevel()
+util.printFuelLevel()
 print("Complete")
 
 
