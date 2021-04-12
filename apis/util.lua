@@ -48,11 +48,20 @@ function moveDown(count)
     end
 end
 
+function digClear()
+    while turtle.detect() do
+        turtle.dig()
+        sleep(0.5)
+    end
+end
+
 function digMove(count)
     count = count or 1
     topUpFuel(false)
     for i = 1, count, 1 do
-        turtle.dig()
+        if turtle.detect then
+            digClear()
+        end
         move(1)
     end
 end
