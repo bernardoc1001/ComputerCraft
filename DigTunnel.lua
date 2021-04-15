@@ -38,13 +38,11 @@ function digLevelsToHeight(length, width, height)
     for curHeight = 1, height, 1 do
         digLengthByWidth(length, width)
         if curHeight < height then
-            util.digMoveUp()
+            util.digMove(1, util.directions.up)
         end
     end
-    util.moveDown(height - 1)
-    util.turnAround()
-    util.move()
-    util.turnAround()
+    util.move(height - 1, util.directions.down)
+    util.move(1, util.directions.back)
 end
 
 function validateInputs(length, width, height)
