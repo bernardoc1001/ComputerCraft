@@ -9,6 +9,18 @@ directions = {
     back="back"
 }
 
+errMessages = {
+    move = "Failed to move",
+    noBlocks = "Out of blocks"
+}
+
+function throwErrorOnFailure(wasSuccessful, message, level)
+    level = level or 2
+    if not wasSuccessful then
+        error(message, level)
+    end
+end
+
 function printFuelLevel()
     print('Fuel Level: ', turtle.getFuelLevel())
 end
@@ -35,17 +47,21 @@ end
 function move(count, direction)
     count = count or 1
     direction = direction or directions.forward
+
+    local success = false
+
     for i = 1, count, 1 do
         topUpFuel(false)
         if direction == directions.up then 
-            turtle.up()
+            success = turtle.up()
         elseif direction == directions.down then
-            turtle.down()
+            success = turtle.down()
         elseif direction == directions.back then
-            turtle.back()
+            success = turtle.back()
         else
-            turtle.forward()
-        end   
+            success = turtle.forward()
+        end
+        throwErrorOnFailure(success, errMessages.move, 3)   
     end
 end
 
@@ -83,3 +99,31 @@ function digMove(count, direction)
     end
 end
 
+function targetItemSearch(targetItemSlot)
+    turtle.select(targetItemSlot)
+    for i = 1, 16 do
+        if i ~= targetItemSlot and turtle.compareTo(i) then
+            return i
+        end
+    end
+    return -1
+end
+
+function digAndPlace(targetItemSlot, direction)
+    foundItemSlot = targetItemSearch(targetItemSlot)
+    if foundItemSlot < 1 then
+        throwErrorOnFailure(false, errMessages.noBlocks, 3)
+    end
+    turtle.select(foundItemSlot)
+    if direction == directions.up then
+        turtle.digUp()
+        turtle.placeUp()
+    elseif direction == directions.down then
+        turtle.digDown()
+        turtle.placeDown()
+    else
+        turtle.dig()
+        turtle.place()
+    end
+    
+end
